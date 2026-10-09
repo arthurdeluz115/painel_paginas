@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/cron/scan.js": { "maxDuration": 300 },
+    "api/cron/pagespeed.js": { "maxDuration": 300 },
+    "api/scan.js": { "maxDuration": 150 },
+    "api/sites.js": { "maxDuration": 150 },
+    "api/sites/[id].js": { "maxDuration": 150 }
+  },
+  "crons": [
+    { "path": "/api/cron/scan", "schedule": "*/30 * * * *" },
+    { "path": "/api/cron/pagespeed", "schedule": "7 * * * *" }
+  ]
+}
