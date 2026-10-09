@@ -81,9 +81,13 @@ export function computeAlerts(site, scan, psi) {
   }
 
   const players = scan.vturb?.players || [];
+  const abTests = scan.vturb?.abTests || [];
   const expV = site.expectedVturb || [];
-  expV.forEach((id) => !players.includes(id) && add('error', `Player VTurb ${id} não encontrado`));
-  if (expV.length) players.forEach((id) => !expV.includes(id) && add('warn', `Player VTurb não cadastrado: ${id}`));
+  expV.forEach((id) => !players.includes(id) && !abTests.includes(id) && add('error', `Player/teste A/B VTurb ${id} não encontrado`));
+  if (expV.length) {
+    players.forEach((id) => !expV.includes(id) && add('warn', `Player VTurb não cadastrado: ${id}`));
+    abTests.forEach((id) => !expV.includes(id) && add('warn', `Teste A/B VTurb não cadastrado: ${id}`));
+  }
 
   const m = psi?.mobile?.score;
   if (typeof m === 'number' && m < 50) add('warn', `Nota de desempenho mobile baixa (${m})`);

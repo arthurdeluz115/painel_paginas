@@ -193,6 +193,9 @@ export function diffScans(site, prev, next) {
   const v = listDiff(prev.vturb?.players, next.vturb?.players);
   v.added.forEach((id) => push('added', `Player VTurb adicionado: ${id}`));
   v.removed.forEach((id) => push('removed', `Player VTurb removido: ${id}`));
+  const ab = listDiff(prev.vturb?.abTests, next.vturb?.abTests);
+  ab.added.forEach((id) => push('added', `Teste A/B VTurb adicionado: ${id}`));
+  ab.removed.forEach((id) => push('removed', `Teste A/B VTurb removido: ${id}`));
 
   const c = listDiff(prev.checkouts, next.checkouts);
   c.added.forEach((u) => push('added', `Link de checkout adicionado: ${u}`));
