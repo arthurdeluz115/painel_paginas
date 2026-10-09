@@ -95,7 +95,17 @@ main{max-width:1560px;margin:0 auto;padding:18px 16px 60px}
 .tag.client{color:var(--text);cursor:pointer}
 .tag.client:hover{border-color:var(--accent)}
 
-.perf{display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--panel-2);border-radius:12px}
+.card-title .badge{display:inline-block;margin-top:7px}
+.score{flex:none;margin:-2px -2px 0 0}
+.score .ring{width:72px}
+.score .ring svg{width:66px;height:66px}
+.score .ring circle{stroke-width:6}
+.score .ring b{height:66px;font-size:21px;letter-spacing:-.02em}
+.score .ring span{display:block;margin-top:3px;font-size:10.5px;white-space:nowrap}
+@media (max-width:700px){header.top{position:static}}
+.track{display:grid;gap:8px;padding:12px;background:var(--panel-2);border-radius:12px}
+.track .row{min-height:24px}
+.track .trk{padding-top:8px;border-top:1px solid var(--line)}
 .ring{position:relative;width:58px;text-align:center;flex:none}
 .ring svg{width:54px;height:54px;transform:rotate(-90deg);display:block;margin:0 auto}
 .ring circle{fill:none;stroke-width:5}
@@ -457,25 +467,23 @@ function cardHtml(s) {
   const others = Object.keys(tr).filter((k) => k !== 'metaPixel');
   const e = s.alerts.filter((a) => a.level === 'error').length;
   const w = s.alerts.filter((a) => a.level === 'warn').length;
-  const lcp = s.psi?.mobile?.lcp;
-  const tags = [s.client ? `<button class="tag client" data-client="${esc(s.client)}" title="Ver só sites de ${esc(s.client)}">${esc(s.client)}</button>` : '', ...(s.tags || []).map((t) => `<span class="tag">#${esc(t)}</span>`)].join('');
+  const mScore = s.psi?.mobile?.score;
+  const tags =[s.client ? `<button class="tag client" data-client="${esc(s.client)}" title="Ver só sites de ${esc(s.client)}">${esc(s.client)}</button>` : '', ...(s.tags || []).map((t) => `<span class="tag">#${esc(t)}</span>`)].join('');
   return `<article class="card st-${st}" data-open="${esc(s.id)}" tabindex="0">
     <div class="card-top">
-      <div class="card-title"><span class="dot"></span><div style="min-width:0"><h3 title="${esc(s.name)}">${esc(s.name)}</h3><a class="host" href="${esc(s.url)}" target="_blank" rel="noopener" data-stop>${esc(hostOf(s.url))} ↗</a></div></div>
-      <span class="badge">${STATUS_TXT[st]}</span>
+      <div class="card-title"><span class="dot"></span><div style="min-width:0">
+        <h3 title="${esc(s.name)}">${esc(s.name)}</h3>
+        <a class="host" href="${esc(s.url)}" target="_blank" rel="noopener" data-stop>${esc(hostOf(s.url))} ↗</a>
+        <span class="badge">${STATUS_TXT[st]}</span>
+      </div></div>
+      <div class="score" title="Nota PageSpeed no celular${s.psi?.checkedAt ? ' — medida ' + ago(s.psi.checkedAt) : ''}">${ring(mScore, '📱 Mobile')}</div>
     </div>
     ${tags ? `<div class="tags">${tags}</div>` : ''}
-    <div class="perf">
-      ${ring(s.psi?.mobile?.score, 'Mobile')}${ring(s.psi?.desktop?.score, 'Desktop')}
-      <div class="perf-stats">
-        <div><span>LCP mobile</span><b class="${mClass('lcp', lcp)}">${fmtMs(lcp)}</b></div>
-        <div><span>Resposta</span><b>${sc.responseMs != null ? sc.responseMs + ' ms' : '–'}</b></div>
-        <div><span>HTML</span><b>${sc.htmlKb != null ? sc.htmlKb + ' KB' : '–'}</b></div>
-      </div>
-    </div>
+    <div class="track">
     <div class="row"><span class="row-label meta-l">Pixel Meta</span><div class="chips">${meta.map((id) => chip(id, 'meta')).join('')}${missingMeta.map((id) => `<span class="chip miss" title="Esperado, mas não encontrado">${esc(id)}</span>`).join('')}${!meta.length && !missingMeta.length ? '<span class="none">não detectado</span>' : ''}</div></div>
     <div class="row"><span class="row-label vt-l">VTurb</span><div class="chips">${abTests.map((id) => `<button class="chip vturb ab" data-copy="${esc(id)}" title="Teste A/B do VTurb — clique para copiar o ID"><span class="ab-tag">A/B</span>${esc(id.slice(0, 10))}…</button>`).join('')}${players.map((id) => chip(id, 'vturb', id.slice(0, 10) + '…')).join('')}${missingV.map((id) => `<span class="chip miss" title="Esperado, mas não encontrado">${esc(id.slice(0, 10))}…</span>`).join('')}${!players.length && !abTests.length && !missingV.length ? '<span class="none">sem player</span>' : ''}</div></div>
     <div class="trk">${others.map((k) => `<span class="tpill" style="--c:${tm(k).color}" title="${esc(tm(k).label)}: ${esc(tr[k].join(', '))}">${esc(tm(k).short)}${tr[k].length > 1 ? ' ×' + tr[k].length : ''}</span>`).join('')}${(sc.externalScripts || []).length ? `<span class="tpill" style="--c:var(--muted)" title="${esc(sc.externalScripts.join(', '))}">+${sc.externalScripts.length} script${sc.externalScripts.length > 1 ? 's' : ''} externo${sc.externalScripts.length > 1 ? 's' : ''}</span>` : ''}${!others.length && !(sc.externalScripts || []).length ? '<span class="none">nenhum outro rastreador</span>' : ''}</div>
+    </div>
     <div class="card-foot">
       <div class="alerts-mini">${e ? `<span class="am-e">${e} erro${e > 1 ? 's' : ''}</span>` : ''}${w ? `<span class="am-w">${w} aviso${w > 1 ? 's' : ''}</span>` : ''}${!e && !w && s.scan ? '<span class="am-ok">Sem alertas</span>' : ''}</div>
       <span class="ago">${s.scan ? 'verificado ' + ago(s.scan.checkedAt) : 'aguardando…'}</span>
